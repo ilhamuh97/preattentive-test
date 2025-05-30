@@ -1,134 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
-    <meta charset="UTF-8">
-        <title>Page Title</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="stylesheet" href="">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <style>
-        main{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-        #canvasId{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            visibility: hidden;
-        }
-        #canvas-wrapper{
-            display: flex;
-            border: 1px solid #000;
-        }
-        #notFind {
-            display: none;
-        }
-        canvas{
-            max-width: 500px;
-            max-height: 500px;
-        }
-        hr{
-            width: 100%;
-            height: 1px;
-        }
-        .select {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            white-space: nowrap;
-        }
-        #myChart{
-            margin-bottom: 50px;
-        }
-        p{
-            text-align: center;
-            max-width: 500px;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
-    <body>
-        <main class="main">
-            <h1 id="title">Preattentive Test</h1>
-            <p>Please click the canvas below in the position of the preattentive item</p>
-            <div id="canvas-wrapper">
-                <div id='canvasId'></div>
-            </div>
-            <button id="notFind" class="btn btn-secondary">I don't find it</button>
-            <button id="start" class="btn btn-primary">Start</button>
-            <hr>
-            <h3>Test setup</h3>
-            <div class="select" >
-                <label>
-                    Conjunctive:
-                </label>
-                <input id="isConjunctive" type="checkbox" value="true" class="form-check-input"/>
-            </div>
-            <div class="select">
-                <label>
-                    Target Form:
-                </label>
-                <select id="targetForm" class="form-select">
-                    <option value="circle">Circle</option>
-                    <option value="rectangle">Rectangle</option>
-                    <option value="triangle">Triangle</option>
-                    <option value="random">Random</option>
-                </select>
-            </div>
-            <div class="select" class="form-select">
-                <label>
-                    Target Color:
-                </label>
-                <select id="targetColor" class="form-select" disabled>
-                    <option value="red">Red</option>
-                    <option value="green">Green</option>
-                    <option value="blue">Blue</option>
-                </select>
-            </div>
-            <div class="select">
-                <label>
-                    Distractor Form:
-                </label>
-                <select id="distractorForm" class="form-select">
-                    <option value="circle">Circle</option>
-                    <option value="rectangle">Rectangle</option>
-                    <option value="triangle">Triangle</option>
-                    <option value="mix">Mix</option>
-                </select>
-            </div>
-            <div class="select" class="form-select">
-                <label>
-                    Distraction number:
-                </label>
-                <select id="itemNumber" class="form-select">
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="40">40</option>
-                    <option value="50">50</option>
-                    <option value="75">75</option>
-                    <option value="100">100</option>
-                </select>
-            </div>
-            <div class="select">
-                <label>
-                    Time Duration:
-                </label>
-                <select id="timeDuration" class="form-select">
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="250" selected>250</option>
-                    <option value="500">500</option>
-                </select>
-                ms
-            </div>
-            <hr>
-            <h3>Result</h3>
-            <canvas id="myChart" width="400" height="400"></canvas>
-        </main>
-    </body>
-    <script src="sketch.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preattentive Test</title>
 
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+    }
+
+    .landing {
+        background: linear-gradient(to right, #e3f2fd, #ffffff);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .landing img {
+        border-radius: 12px;
+        max-width: 100%;
+        height: auto;
+    }
+
+    @media (max-width: 576px) {
+        .landing h1 {
+            font-size: 2rem;
+        }
+
+        .landing button {
+            font-size: 1rem;
+            padding: 0.75rem 2rem;
+        }
+    }
+
+    #mainApp {
+        display: none;
+        padding: 2rem;
+    }
+
+    select:focus,
+    select.highlight {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .form-check-input:checked {
+        outline: 2px solid #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.4);
+    }
+
+    #configSummary {
+        background-color: #fff3cd;
+        border-left: 5px solid #ffc107;
+        padding: 10px 15px;
+        margin-top: 20px;
+        border-radius: 5px;
+    }
+
+    .canvas-wrapper {
+        min-height: 200px;
+        background-color: #fefefe;
+    }
+
+    .section-title {
+        border-left: 4px solid #0d6efd;
+        padding-left: 0.75rem;
+    }
+
+    #summaryList li strong {
+        color: #0d6efd;
+    }
+
+    .btn-back {
+        font-size: 1rem;
+        padding: 0.5rem 1.5rem;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Landing Page -->
+<div class="landing animate__animated animate__fadeIn" id="landingPage">
+  <div class="container text-center">
+    <h1 class="display-3 fw-bold mb-3">👁️ Preattentive Vision Test</h1>
+    <p class="lead mb-4">Challenge your brain! Quickly identify the odd item out and discover how fast your visual system reacts.</p>
+
+    <div class="mb-4">
+      <img src="https://media.giphy.com/media/l0HUpt2s9Pclgt9Vm/giphy.gif" alt="Eye Scanning Animation" class="img-fluid rounded shadow" style="max-height: 250px;">
+    </div>
+
+    <button class="btn btn-lg btn-success px-5 py-3 fw-semibold shadow-sm animate__animated animate__pulse animate__infinite" onclick="navigateToMain()">
+      🚀 Start the Test
+    </button>
+
+    <div class="mt-4 text-muted">
+      <small>Created to explore how preattentive processing works in human perception.</small>
+    </div>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="mainApp" class="container animate__animated animate__fadeIn py-4">
+  <h2 class="text-center mb-2 fw-bold text-primary">🧠 Preattentive Test</h2>
+  <p class="text-center text-muted mb-4">Click where you spot the odd one out. Customize the test settings below before starting.</p>
+
+  <!-- Canvas -->
+  <div class="canvas-wrapper bg-white border rounded shadow-sm p-3 mb-4 text-center">
+    <div id="canvasId" class="d-inline-block"></div>
+  </div>
+
+  <!-- Control Buttons -->
+  <div class="text-center mb-5">
+    <button id="start" class="btn btn-lg btn-success px-4 me-2">
+      ▶️ Start Test
+    </button>
+    <button id="notFind" class="btn btn-lg btn-outline-danger">
+      ❌ I can't find it
+    </button>
+  </div>
+
+  <!-- Configuration Summary -->
+  <div id="configSummary" class="alert alert-warning shadow-sm mb-5">
+    <h5 class="mb-2"><i class="bi bi-gear"></i> Selected Configuration:</h5>
+    <ul id="summaryList" class="mb-0 ps-3 small"></ul>
+  </div>
+
+  <!-- Test Setup -->
+  <div class="section-title mb-3">
+    <h4 class="text-secondary"><i class="bi bi-sliders"></i> Test Setup</h4>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="isConjunctive">
+        <label class="form-check-label" for="isConjunctive"><strong>Enable Conjunctive</strong></label>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label for="targetForm" class="form-label">Target Form</label>
+      <select id="targetForm" class="form-select">
+        <option value="circle">Circle</option>
+        <option value="rectangle">Rectangle</option>
+        <option value="triangle">Triangle</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
+
+    <div id="targetColorSection" class="col-md-6" hidden>
+      <label for="targetColor" class="form-label">Target Color</label>
+      <select id="targetColor" class="form-select">
+        <option value="red">Red</option>
+        <option value="green">Green</option>
+        <option value="blue">Blue</option>
+      </select>
+    </div>
+
+    <div id="distractorFormSection" class="col-md-6">
+      <label for="distractorForm" class="form-label">Distractor Form</label>
+      <select id="distractorForm" class="form-select">
+        <option value="circle">Circle</option>
+        <option value="rectangle">Rectangle</option>
+        <option value="triangle">Triangle</option>
+        <option value="mix">Mix</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label for="itemNumber" class="form-label">Distraction Number</label>
+      <select id="itemNumber" class="form-select">
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="75">75</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label for="timeDuration" class="form-label">Time Duration (ms)</label>
+      <select id="timeDuration" class="form-select">
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="250" selected>250</option>
+        <option value="500">500</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="section-title mt-5">
+    <h4 class="text-secondary"><i class="bi bi-bar-chart-line"></i> Results</h4>
+  </div>
+  <canvas id="myChart" width="400" height="400" class="my-3 border rounded shadow-sm bg-light p-2"></canvas>
+
+  <div class="text-center mt-4">
+    <button class="btn btn-outline-secondary btn-back" onclick="goBackToLanding()">
+      🔙 Back to Home
+    </button>
+  </div>
+</div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/p5.js"></script>
+  <script src="sketch.js"></script>
+
+</body>
 </html>
