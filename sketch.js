@@ -522,6 +522,12 @@ function updateConfigSummary() {
   `;
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+  if (window.innerWidth < 768) {
+    document.getElementById("mobileWarning").classList.remove("d-none");
+  }
+});
+
 // Attach listeners
 document.querySelectorAll("select, #isConjunctive").forEach((elem) => {
   elem.addEventListener("change", () => {
